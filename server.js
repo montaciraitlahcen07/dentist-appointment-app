@@ -56,6 +56,7 @@ const DB_SSL_ENABLED = DATABASE_URL
 const CORS_ORIGINS = readEnv("CORS_ORIGINS")
   .split(",")
   .map((value) => value.trim())
+  .map((value) => value.replace(/\/+$/, ""))
   .filter(Boolean);
 
 const dbConfig = {

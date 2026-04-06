@@ -13,6 +13,9 @@ let fullyBookedDates = new Set();
 let activeMonthAvailabilityRequest = 0;
 
 const API_URL = "/api";
+const IS_LOCALHOST =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
 
 // Time slots (French format)
 const allTimeSlots = [
@@ -53,6 +56,24 @@ function normalizeTimeSlotValue(time) {
   if (meridiem === "AM" && hours === 12) hours = 0;
 
   return `${hours}:${minutes}`;
+}
+
+async function parseJsonResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
+  const isJson = contentType.includes("application/json");
+  const payload = isJson ? await response.json() : null;
+
+  if (!response.ok) {
+    throw new Error(
+      payload?.error || "Le serveur a refuse la requete.",
+    );
+  }
+
+  if (!isJson) {
+    throw new Error("Le serveur a retourne une reponse invalide.");
+  }
+
+  return payload;
 }
 
 // Initialize
@@ -354,13 +375,21 @@ async function loadMonthAvailability() {
 
   try {
     const response = await fetch(`${API_URL}/appointments`);
-    const appointments = await response.json();
+    const appointments = await parseJsonResponse(response);
 
     if (requestId !== activeMonthAvailabilityRequest) return;
 
     fullyBookedDates = computeFullyBookedDateSet(appointments);
     renderCalendar();
   } catch (error) {
+    if (!IS_LOCALHOST) {
+      console.error("Failed to load month availability:", error);
+      if (requestId !== activeMonthAvailabilityRequest) return;
+      fullyBookedDates = new Set();
+      renderCalendar();
+      return;
+    }
+
     const appointments = JSON.parse(localStorage.getItem("appointments") || "[]");
 
     if (requestId !== activeMonthAvailabilityRequest) return;
@@ -435,7 +464,7 @@ async function selectDate(dateStr) {
 
   try {
     const response = await fetch(`${API_URL}/booked-times/${dateStr}`);
-    const nextBookedTimes = await response.json();
+    const nextBookedTimes = await parseJsonResponse(response);
 
     if (requestId !== activeBookingRequest) return;
 
@@ -443,6 +472,14 @@ async function selectDate(dateStr) {
     renderTimeSlots();
     scrollToBookingStep("time");
   } catch (error) {
+    if (!IS_LOCALHOST) {
+      console.error("Failed to load booked times:", error);
+      if (requestId !== activeBookingRequest) return;
+      container.innerHTML =
+        '<p class="select-prompt">Impossible de charger les horaires. Veuillez reessayer.</p>';
+      return;
+    }
+
     console.log("Server not available, using local storage");
 
     if (requestId !== activeBookingRequest) return;
@@ -657,7 +694,7 @@ async function bookAppointment() {
       body: JSON.stringify(appointmentData),
     });
 
-    const result = await response.json();
+    const result = await parseJsonResponse(response);
 
     if (result.success) {
       setBookingFormError("");
@@ -691,6 +728,14 @@ async function bookAppointment() {
       );
     }
   } catch (error) {
+    if (!IS_LOCALHOST) {
+      setBookButtonLoading(false);
+      setBookingFormError(
+        error.message || "Erreur lors de la reservation. Veuillez reessayer.",
+      );
+      return;
+    }
+
     console.log("Server not available, saving locally");
 
     const appointments = JSON.parse(
