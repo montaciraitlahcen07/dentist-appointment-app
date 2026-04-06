@@ -1,0 +1,20 @@
+# robots.txt for DentaCare Clinic
+# Allow search engines to crawl all public pages
+
+User-agent: *
+Allow: /
+
+# Disallow admin/private areas (if added later)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Sitemap location
+Sitemap: http://localhost:3000/sitemap.xml
+
+# Crawl delay (optional, for slower sites)
+# Crawl-delay: 1
+
+# Block specific sensitive paths
+Disallow: /*.db$
+Disallow: /*.sql$
+Disallow: /node_modules/

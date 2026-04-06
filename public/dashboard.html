@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DentaCare Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="auth-shell" id="authShell">
+      <section class="auth-card">
+        <div class="brand-mark">
+          <span class="brand-dot"></span>
+          <span>DentaCare Clinic</span>
+        </div>
+        <p class="eyebrow">Espace proprietaire</p>
+        <h1>Connexion dashboard</h1>
+        <p class="subtitle">
+          Accedez a la gestion des rendez-vous, des statuts et du planning du cabinet.
+        </p>
+        <form id="loginForm" class="auth-form">
+          <label>
+            <span>Nom d'utilisateur</span>
+            <input type="text" id="loginUsername" autocomplete="username" required />
+          </label>
+          <label>
+            <span>Mot de passe</span>
+            <input
+              type="password"
+              id="loginPassword"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+          <p class="feedback" id="loginFeedback" hidden></p>
+          <button class="primary-button" type="submit">Se connecter</button>
+        </form>
+      </section>
+    </div>
+
+    <div id="dashboardShell" hidden>
+      <header class="dashboard-header">
+        <div class="dashboard-shell">
+          <div class="hero-banner">
+            <div class="hero-copy">
+              <div class="brand-mark">
+                <span class="brand-dot"></span>
+                <span>DentaCare Clinic</span>
+              </div>
+              <p class="eyebrow">Dashboard proprietaire</p>
+              <h1>Gestion des rendez-vous du cabinet</h1>
+              <p class="subtitle">
+                Meme base MySQL que le site client, avec creation manuelle, suivi des statuts
+                et controle du planning.
+              </p>
+            </div>
+            <div class="header-actions">
+              <button class="refresh-button" id="logoutBtn" type="button">
+                Deconnexion
+              </button>
+              <a class="back-link" href="/">Retour au site</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="dashboard-shell dashboard-main">
+        <section class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-label">Total</span>
+            <strong class="stat-value" id="statTotal">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Confirmes</span>
+            <strong class="stat-value" id="statConfirmed">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">En attente</span>
+            <strong class="stat-value" id="statPending">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Aujourd'hui</span>
+            <strong class="stat-value" id="statToday">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">A venir</span>
+            <strong class="stat-value" id="statUpcoming">0</strong>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-topbar">
+            <div>
+              <h2>Ajouter un rendez-vous</h2>
+              <p>Le proprietaire peut creer une fiche client directement.</p>
+            </div>
+          </div>
+
+          <form id="createAppointmentForm" class="create-form">
+            <label>
+              <span>Nom complet</span>
+              <input
+                type="text"
+                id="createName"
+                inputmode="text"
+                pattern="[A-Za-zÀ-ÿ' -]+"
+                required
+              />
+            </label>
+            <label>
+              <span>Telephone</span>
+              <input
+                type="tel"
+                id="createPhone"
+                inputmode="numeric"
+                pattern="[0-9 +]+"
+                required
+              />
+            </label>
+            <label>
+              <span>Date</span>
+              <input type="date" id="createDate" required />
+            </label>
+            <label>
+              <span>Heure</span>
+              <input type="time" id="createTime" required />
+            </label>
+            <label>
+              <span>Statut</span>
+              <select id="createStatus">
+                <option value="pending">En attente</option>
+                <option value="confirmed">Confirme</option>
+                <option value="completed">Termine</option>
+                <option value="cancelled">Annule</option>
+              </select>
+            </label>
+            <label class="notes-field">
+              <span>Notes</span>
+              <textarea id="createNotes" rows="3"></textarea>
+            </label>
+            <div class="create-actions">
+              <button class="primary-button" id="createBtn" type="submit">
+                Ajouter le rendez-vous
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-topbar">
+            <div>
+              <h2>Liste des rendez-vous</h2>
+              <p>Filtrez, mettez a jour le statut ou supprimez une entree.</p>
+            </div>
+            <button class="refresh-button" id="refreshBtn" type="button">
+              Actualiser
+            </button>
+          </div>
+
+          <div class="filters">
+            <label>
+              <span>Rechercher</span>
+              <input type="search" id="searchInput" placeholder="Nom ou telephone" />
+            </label>
+            <label>
+              <span>Date</span>
+              <input type="date" id="dateFilter" />
+            </label>
+            <label>
+              <span>Statut</span>
+              <select id="statusFilter">
+                <option value="">Tous</option>
+                <option value="pending">En attente</option>
+                <option value="confirmed">Confirme</option>
+                <option value="completed">Termine</option>
+                <option value="cancelled">Annule</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="feedback" id="feedback" hidden></p>
+
+          <div class="table-wrap">
+            <table class="appointments-table">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Telephone</th>
+                  <th>Date</th>
+                  <th>Heure</th>
+                  <th>Notes</th>
+                  <th>Statut</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="appointmentsBody">
+                <tr>
+                  <td colspan="7" class="empty-state">Chargement...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>

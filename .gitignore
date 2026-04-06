@@ -1,0 +1,25 @@
+node_modules/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+*.pid
+Microsoft/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Local database dumps / imports
+mysql_import_appointments.sql
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+public/*.min.js
+public/*.min.css
+
+/generated/prisma
